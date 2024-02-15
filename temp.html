@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storico</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background: linear-gradient(to right, #2980b9, #6dd5fa); /* Gradient background */
+            color: #fff; /* Text color */
+        }
+
+        .chart-container {
+            max-width: 80%;
+            margin: 20px auto;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Box shadow for depth effect */
+        }
+
+        .chart {
+            height: 400px;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 20px;
+            margin: 0 10px;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .navbar a:hover {
+            border-color: #ddd;
+        }
+
+        .select-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        select {
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        @media screen and (max-width: 500px) {
+            .chart-container {
+                max-width: 95%;
+            }
+        }
+    </style>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/histogram-bellcurve.js"></script>
+	<script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <!-- Add any additional head elements or stylesheets here -->
+</head>
+
+<body>
+    <div class="navbar">
+        <a href="index.html">Rainfall</a>
+        <a href="temp.html">Temperature</a>
+    </div>
+
+    <div class="chart-container">
+        <div id="container_d" class="chart"></div>
+    </div>
+    <div class="chart-container">
+        <div id="container_m" class="chart"></div>
+    </div>
+    <div class="chart-container">
+        <div id="container_c" class="chart"></div>
+    </div>
+    <div class="chart-container">
+        <div id="container_g" class="chart"></div>
+    </div>
+
+    <script src="js/resources.js"></script>
+    <script src="js/temp.js"></script>
+</body>
+
+</html>
