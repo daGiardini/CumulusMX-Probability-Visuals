@@ -315,7 +315,7 @@ function loadData(year) {
         //Past years data
         const dailyRain = data.rain.filter(
           (r) =>
-            new Date(r[0]).getFullYear() != resources.start_year &&
+            new Date(r[0]).getFullYear() != resources.start_year - 1 &&
             new Date(r[0]).getFullYear() != new Date().getFullYear()
         );
 

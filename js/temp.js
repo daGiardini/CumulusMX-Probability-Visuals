@@ -326,7 +326,7 @@ function loadData(year) {
         //Past years data
         const dailyTemp = data.avgTemp.filter(
           (r) =>
-            new Date(r[0]).getFullYear() != resources.start_year &&
+            new Date(r[0]).getFullYear() != resources.start_year - 1 &&
             new Date(r[0]).getFullYear() != new Date().getFullYear()
         );
 
@@ -392,7 +392,7 @@ function loadData(year) {
         const tempMean = data.avgTemp
           .filter(
             (avg) =>
-              new Date(avg[0]).getFullYear() != resources.start_year &&
+              new Date(avg[0]).getFullYear() != resources.start_year - 1 &&
               new Date(avg[0]).getFullYear() != new Date().getFullYear()
           )
           .reverse();
@@ -421,13 +421,13 @@ function loadData(year) {
 
         const tempMax = data.maxTemp.filter(
           (avg) =>
-            new Date(avg[0]).getFullYear() != 2017 &&
+            new Date(avg[0]).getFullYear() != resources.start_year - 1 &&
             new Date(avg[0]).getFullYear() != new Date().getFullYear()
         );
 
         const tempMin = data.minTemp.filter(
           (avg) =>
-            new Date(avg[0]).getFullYear() != 2017 &&
+            new Date(avg[0]).getFullYear() != resources.start_year - 1 &&
             new Date(avg[0]).getFullYear() != new Date().getFullYear()
         );
 
