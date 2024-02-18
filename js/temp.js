@@ -1,9 +1,23 @@
-const selected_year =
-  new URLSearchParams(window.location.search).get("year") ??
-  new Date().getFullYear();
-loadData(selected_year)
-  .then((prob_data) => {
+let data = {};
+let prob_data = {};
+
+loadData()
+  .then(() => {
     const pointsInInterval = 5;
+
+    const select = document.getElementById("year_selector");
+
+    for (
+      let index = new Date().getFullYear();
+      index >= resources.start_year;
+      index--
+    ) {
+      const option = document.createElement("option");
+      option.text = index;
+      option.value = index;
+
+      select.appendChild(option);
+    }
 
     //Max > 30
     Highcharts.chart("container_d", {
@@ -195,114 +209,22 @@ loadData(selected_year)
     });
 
     //Confidence
-    Highcharts.chart("container_c", {
-      chart: {
-        renderTo: "container",
-        inverted: false,
-      },
-      title: {
-        text: "Temp. confidence intervals",
-      },
-
-      xAxis: {
-        categories: Object.keys(prob_data.ds).map((monthNumber) => {
-          const date = new Date();
-          date.setMonth(monthNumber);
-
-          return date.toLocaleString("en-US", { month: "short" });
-        }),
-      },
-
-      yAxis: [
-        {
-          title: {
-            text: "Temperature [°C]",
-          },
-          gridZIndex: -1,
-          plotLines: [{ value: 0, color: "red", width: 1 }],
-        },
-      ],
-
-      plotOptions: {
-        columnrange: {
-          grouping: false,
-          color: "red",
-        },
-        scatter: {
-          color: "red",
-          marker: {
-            symbol: "circle",
-          },
-        },
-      },
-
-      tooltip: {
-        shared: true,
-      },
-      legend: {
-        enabled: true,
-      },
-      series: [
-        {
-          type: "areasplinerange",
-          showInLegend: false,
-          enableMouseTracking: false,
-          data: prob_data.ds.map((d) => [d.mean + d.sd, d.mean - d.sd]),
-          color: "gray",
-          marker: {
-            radius: 0,
-          },
-        },
-        {
-          type: "spline",
-          showInLegend: true,
-          enableMouseTracking: true,
-          name: `Temperature (${selected_year})`,
-          color: "orange",
-          data: prob_data.ds
-            .map((d) => {
-              if (d.rain_ty != undefined) {
-                return parseFloat(d.rain_ty.toFixed(1));
-              }
-            })
-            .filter((d) => d != undefined),
-          marker: {
-            radius: 4,
-          },
-        },
-      ],
-      responsive: {
-        rules: [
-          {
-            condition: {
-              maxWidth: 500,
-            },
-            chartOptions: {
-              legend: {
-                layout: "horizontal",
-                align: "center",
-                verticalAlign: "bottom",
-              },
-            },
-          },
-        ],
-      },
-    });
+    setConfidenceChart();
   })
   .catch((error) => {
     console.log(error);
   });
 
-function loadData(year) {
+function loadData() {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await fetch(resources.path + "alldailytempdata.json");
-      const data = await response.json();
+      data = await response.json();
 
       if (data) {
         //////////////////Confidence Charts///////////////////////
         //This year data
-        const selected_year = year ?? new Date().getFullYear();
+        const selected_year = new Date().getFullYear();
         const current_year = data.avgTemp.filter(
           (r) => new Date(r[0]).getFullYear() == selected_year
         );
@@ -502,18 +424,216 @@ function loadData(year) {
           }
         });
 
-        resolve({
+        prob_data = {
           prob: temp_final,
           year: final_temp_year,
           ds: temp_month_ds,
-        });
+        };
+
+        resolve();
       } else {
-        reject({});
+        prob_data = {};
+        reject();
       }
     } catch (error) {
       console.error(error);
-      reject({});
+      prob_data = {};
+      reject();
     }
+  });
+}
+
+function updateData(year) {
+  if (data) {
+    //////////////////Confidence Charts///////////////////////
+    //This year data
+    const selected_year = year ?? new Date().getFullYear();
+    const current_year = data.avgTemp.filter(
+      (r) => new Date(r[0]).getFullYear() == selected_year
+    );
+
+    const current_year_temp = [];
+    const temp = {};
+
+    current_year.map((cy) => {
+      if (temp?.[new Date(cy[0]).getMonth()] == undefined) {
+        temp[new Date(cy[0]).getMonth()] = [];
+      }
+      temp[new Date(cy[0]).getMonth()].push(cy[1]);
+    });
+
+    Object.keys(temp).map((t) => {
+      current_year_temp.push(
+        temp[t].reduce((sum, value) => sum + value, 0) / temp[t].length
+      );
+    });
+
+    //Past years data
+    const dailyTemp = data.avgTemp.filter(
+      (r) =>
+        new Date(r[0]).getFullYear() != resources.start_year - 1 &&
+        new Date(r[0]).getFullYear() != new Date().getFullYear()
+    );
+
+    const temp_month = {};
+
+    dailyTemp.map((dr) => {
+      if (temp_month?.[new Date(dr[0]).getMonth()] == undefined) {
+        temp_month[new Date(dr[0]).getMonth()] = {};
+      }
+
+      if (
+        temp_month[new Date(dr[0]).getMonth()]?.[
+          new Date(dr[0]).getFullYear()
+        ] == undefined
+      ) {
+        temp_month[new Date(dr[0]).getMonth()][new Date(dr[0]).getFullYear()] =
+          [];
+      }
+
+      temp_month[new Date(dr[0]).getMonth()][
+        new Date(dr[0]).getFullYear()
+      ].push(dr[1]);
+    });
+
+    const hold = {};
+
+    Object.keys(temp_month).map((key) => {
+      hold[key] = {};
+      for (const year in temp_month[key]) {
+        hold[key][year] =
+          temp_month[key][year].reduce((sum, value) => sum + value, 0) /
+          temp_month[key][year].length;
+      }
+    });
+
+    const hold1 = {};
+
+    for (const month in hold) {
+      hold1[month] = [];
+      for (const year in hold[month]) {
+        hold1[month].push(hold[month][year]);
+      }
+    }
+
+    const temp_month_ds = [];
+
+    Object.keys(hold1).map((key) => {
+      const mean_sd = calculate(hold1[key]);
+      if (hold1?.[key] != undefined) {
+        temp_month_ds.push({
+          mean: mean_sd.mean,
+          sd: mean_sd.sd,
+          rain_ty: current_year_temp[key],
+        });
+      } else {
+        temp_month_ds.push({ mean: mean_sd.mean, sd: mean_sd.sd });
+      }
+    });
+
+    prob_data.ds = temp_month_ds;
+
+    const select = document.getElementById("year_selector");
+
+    setConfidenceChart(select.value);
+  }
+}
+
+function setConfidenceChart(syear) {
+  const selected_year = syear ?? new Date().getFullYear();
+  //Confidence
+  Highcharts.chart("container_c", {
+    chart: {
+      renderTo: "container",
+      inverted: false,
+    },
+    title: {
+      text: "Temp. confidence intervals",
+    },
+
+    xAxis: {
+      categories: Object.keys(prob_data.ds).map((monthNumber) => {
+        const date = new Date();
+        date.setMonth(monthNumber);
+
+        return date.toLocaleString("en-US", { month: "short" });
+      }),
+    },
+
+    yAxis: [
+      {
+        title: {
+          text: "Temperature [°C]",
+        },
+        gridZIndex: -1,
+        plotLines: [{ value: 0, color: "red", width: 1 }],
+      },
+    ],
+
+    plotOptions: {
+      columnrange: {
+        grouping: false,
+        color: "red",
+      },
+      scatter: {
+        color: "red",
+        marker: {
+          symbol: "circle",
+        },
+      },
+    },
+
+    tooltip: {
+      shared: true,
+    },
+    legend: {
+      enabled: true,
+    },
+    series: [
+      {
+        type: "areasplinerange",
+        showInLegend: false,
+        enableMouseTracking: false,
+        data: prob_data.ds.map((d) => [d.mean + d.sd, d.mean - d.sd]),
+        color: "#BDC3C7",
+        marker: {
+          radius: 0,
+        },
+      },
+      {
+        type: "spline",
+        showInLegend: true,
+        enableMouseTracking: true,
+        name: `Temperature (${selected_year})`,
+        color: "orange",
+        data: prob_data.ds
+          .map((d) => {
+            if (d.rain_ty != undefined) {
+              return parseFloat(d.rain_ty.toFixed(1));
+            }
+          })
+          .filter((d) => d != undefined),
+        marker: {
+          radius: 4,
+        },
+      },
+    ],
+    responsive: {
+      rules: [
+        {
+          condition: {
+            maxWidth: 500,
+          },
+          chartOptions: {
+            legend: {
+              layout: "horizontal",
+              align: "center",
+              verticalAlign: "bottom",
+            },
+          },
+        },
+      ],
+    },
   });
 }
 

@@ -9,12 +9,12 @@
       <meta property="og:site_name" content="CumulusMX Visualizations">
       <title>CumulusMX Weather Probability Visualizations</title>
       <meta property="og:type"  content="website" />
-      <meta property="og:url"   content="" />
+      <meta property="og:url"   content="https://multedometeo.altervista.org/dati/cuMx/temp.html" />
       <!-- Image -->
-      <meta property="og:image" content="" />
+      <meta property="og:image" content="https://multedometeo.altervista.org/miniRete/img/logo.jpg" />
       <meta property="og:image:alt"    content="Website icon" />
       <meta property="og:image:height" content="80" />
-      <meta property="og:image:secure_url" content="" />
+      <meta property="og:image:secure_url" content="https://multedometeo.altervista.org/miniRete/img/logo.jpg" />
       <meta property="og:image:type"  content="image/jpg" />
       <meta property="og:image:width" content="80" />
       <meta charset="utf-8">
@@ -59,13 +59,21 @@
          .navbar a:hover {
          border-color: #ddd;
          }
-         .select-container {
+         /* Basic styling for the selector */
+         .selector {
          text-align: center;
-         margin: 20px 0;
          }
-         select {
+         /* Style for the dropdown select */
+         .selector select {
          padding: 10px;
          font-size: 16px;
+         cursor: pointer;
+         border: 1px solid #ccc;
+         border-radius: 4px;
+         }
+         /* Style for the options in the dropdown select */
+         .selector select option {
+         padding: 12px;
          }
          @media screen and (max-width: 500px) {
          .chart-container {
@@ -91,6 +99,10 @@
       </div>
       <div class="chart-container">
          <div id="container_m" class="chart"></div>
+      </div>
+      <div class="selector">
+         <select id="year_selector" onchange="updateData(this.value);">
+         </select>
       </div>
       <div class="chart-container">
          <div id="container_c" class="chart"></div>
