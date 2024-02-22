@@ -23,11 +23,9 @@ Effortlessly visualize weather probabilities with Highcharts and CumulusMX data.
 ### 5. Temperature Probability Charts
 - Explore the likelihood of temperature ranges.
 - Visualize probabilities for various temperature scenarios.
+  
+> [!IMPORTANT]  
+> To ensure accurate data integration, remember to modify the `resources.js` file according to your data source details.
 
-## Important Note
-
-To ensure accurate data integration, remember to modify the `resources.js` file according to your data source details.
-
-Ensure a reliable dataset by having a substantial amount of data (> 5 years) for accurate and meaningful visualizations.
-
-Start gaining deeper weather insights today!
+> [!WARNING]  
+> Ensure a reliable dataset by having a substantial amount of data (> 5 years) for accurate and meaningful visualizations.
